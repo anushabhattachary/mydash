@@ -136,13 +136,13 @@ export default function HabitModal({
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -152,7 +152,7 @@ export default function HabitModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-x-4 bottom-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-[100] w-auto md:w-[480px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl rounded-3xl border border-sand shadow-2xl"
+            className="relative w-full max-w-[480px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl rounded-3xl border border-sand shadow-2xl z-10"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-sand/50">
@@ -348,7 +348,7 @@ export default function HabitModal({
               </div>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
