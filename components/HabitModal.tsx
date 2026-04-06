@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Clock, Repeat, Palette } from "lucide-react";
 import {
@@ -46,6 +47,8 @@ export default function HabitModal({
   initialHabit,
 }: HabitModalProps) {
   const isEditing = !!initialHabit;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const [title, setTitle] = useState("");
   const [timeSlot, setTimeSlot] = useState("09:00");
@@ -130,7 +133,7 @@ export default function HabitModal({
 
   const recurrencePreview = getRecurrenceLabel(buildRecurrence());
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -139,7 +142,7 @@ export default function HabitModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
             onClick={onClose}
           />
 
@@ -149,7 +152,7 @@ export default function HabitModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-x-4 bottom-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50 w-auto md:w-[480px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl rounded-3xl border border-sand shadow-2xl"
+            className="fixed inset-x-4 bottom-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-[100] w-auto md:w-[480px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl rounded-3xl border border-sand shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-sand/50">
@@ -349,4 +352,7 @@ export default function HabitModal({
       )}
     </AnimatePresence>
   );
+
+  if (!mounted) return null;
+  return createPortal(modalContent, document.body);
 }
