@@ -11,6 +11,16 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // Mediterranean theme colors
+        sand: "#F5F1EB",
+        sage: "#B0C4B1",
+        terra: "#D98064",
+        clay: "#D4A373",
+        linen: "#F7F5F0",
+      },
+      fontFamily: {
+        serif: ["var(--font-cormorant)", "serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
       },
     },
   },
