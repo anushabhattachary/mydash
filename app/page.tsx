@@ -1,6 +1,7 @@
 import Sidebar from "@/components/Sidebar";
 import LiveHeader from "@/components/LiveHeader";
 import Timeline from "@/components/Timeline";
+import TasksForToday from "@/components/TasksForToday";
 import Goals from "@/components/Goals";
 import ToDo from "@/components/ToDo";
 import CalendarEvents from "@/components/CalendarEvents";
@@ -15,9 +16,12 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto px-4 md:px-12 pb-12 w-full custom-scrollbar">
           <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] xl:grid-cols-[1.2fr_1.5fr] gap-8 max-w-7xl mx-auto h-full items-start">
             
-            {/* Left Column: Timeline */}
-            <div className="h-[800px] lg:h-[calc(100vh-200px)] sticky top-4">
-              <Timeline />
+            {/* Left Column: Timeline and Tasks */}
+            <div className="flex flex-col gap-6">
+              <div className="h-[800px] lg:h-[calc(100vh-200px)] sticky top-4 mb-4">
+                <Timeline />
+              </div>
+              <TasksForToday />
             </div>
 
             {/* Right Column: Calendar + Goals + ToDo */}
