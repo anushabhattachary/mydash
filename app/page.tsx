@@ -3,6 +3,7 @@ import LiveHeader from "@/components/LiveHeader";
 import Timeline from "@/components/Timeline";
 import Goals from "@/components/Goals";
 import ToDo from "@/components/ToDo";
+import CalendarEvents from "@/components/CalendarEvents";
 
 export default function Home() {
   return (
@@ -19,9 +20,12 @@ export default function Home() {
               <Timeline />
             </div>
 
-            {/* Right Column: Goals + ToDo */}
+            {/* Right Column: Calendar + Goals + ToDo */}
             <div className="flex flex-col gap-12 pt-0 md:pt-4">
-              <Goals />
+              <CalendarEvents />
+              <div className="border-t border-sand/50 pt-12">
+                <Goals />
+              </div>
               <div className="border-t border-sand/50 pt-12">
                 <ToDo />
               </div>
@@ -33,3 +37,4 @@ export default function Home() {
     </>
   );
 }
+
