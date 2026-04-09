@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Check, Trash2, Plus, ListTodo } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useUserProfile } from "@/lib/userProfile";
 
 type Task = {
   id: string;
@@ -26,26 +27,46 @@ export default function TasksForToday() {
   const [category, setCategory] = useState("General");
   const [newCategory, setNewCategory] = useState("");
   const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+  
+  const { profile, isLoaded } = useUserProfile();
 
   useEffect(() => {
+    if (!isLoaded || !profile) return;
     setIsClient(true);
     try {
-      const savedTasks = localStorage.getItem("tasksForToday");
-      const savedCategories = localStorage.getItem("taskCategories");
+      const savedTasks = localStorage.getItem(`lilac_${profile.userId}_tasksForToday`);
+      const savedCategories = localStorage.getItem(`lilac_${profile.userId}_taskCategories`);
       
-      if (savedTasks) setTasks(JSON.parse(savedTasks));
-      if (savedCategories) setCategories(JSON.parse(savedCategories));
+      const oldSavedTasks = localStorage.getItem("tasksForToday");
+      const oldSavedCategories = localStorage.getItem("taskCategories");
+      
+      if (savedTasks) {
+        setTasks(JSON.parse(savedTasks));
+      } else if (oldSavedTasks) {
+        setTasks(JSON.parse(oldSavedTasks));
+        localStorage.setItem(`lilac_${profile.userId}_tasksForToday`, oldSavedTasks);
+        localStorage.removeItem("tasksForToday");
+      }
+      
+      if (savedCategories) {
+        setCategories(JSON.parse(savedCategories));
+      } else if (oldSavedCategories) {
+        setCategories(JSON.parse(oldSavedCategories));
+        localStorage.setItem(`lilac_${profile.userId}_taskCategories`, oldSavedCategories);
+        localStorage.removeItem("taskCategories");
+      }
     } catch (e) {
       console.error("Failed to load tasks from local storage", e);
     }
-  }, []);
+  }, [isLoaded, profile?.userId]);
 
   // Listen for cross-component habit additions (e.g. from Cycle Tracker)
   useEffect(() => {
     const handleTasksUpdated = () => {
+      if (!profile) return;
       try {
-        const savedTasks = localStorage.getItem("tasksForToday");
-        const savedCategories = localStorage.getItem("taskCategories");
+        const savedTasks = localStorage.getItem(`lilac_${profile.userId}_tasksForToday`);
+        const savedCategories = localStorage.getItem(`lilac_${profile.userId}_taskCategories`);
         if (savedTasks) setTasks(JSON.parse(savedTasks));
         if (savedCategories) setCategories(JSON.parse(savedCategories));
       } catch (e) {
@@ -54,14 +75,14 @@ export default function TasksForToday() {
     };
     window.addEventListener("tasks-updated", handleTasksUpdated);
     return () => window.removeEventListener("tasks-updated", handleTasksUpdated);
-  }, []);
+  }, [profile?.userId]);
 
   useEffect(() => {
-    if (isClient) {
-      localStorage.setItem("tasksForToday", JSON.stringify(tasks));
-      localStorage.setItem("taskCategories", JSON.stringify(categories));
+    if (isClient && profile?.userId) {
+      localStorage.setItem(`lilac_${profile.userId}_tasksForToday`, JSON.stringify(tasks));
+      localStorage.setItem(`lilac_${profile.userId}_taskCategories`, JSON.stringify(categories));
     }
-  }, [tasks, categories, isClient]);
+  }, [tasks, categories, isClient, profile?.userId]);
 
   const addTask = (e: React.FormEvent) => {
     e.preventDefault();

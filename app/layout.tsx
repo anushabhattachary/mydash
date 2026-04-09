@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Anusha's Dashboard",
+  title: "Lilac — Your Daily Sanctuary",
   description: "A calm, beautiful daily life OS.",
 };
 
@@ -71,6 +71,9 @@ export default function RootLayout({
         <Providers>
           <div className="relative z-10 flex flex-col md:flex-row min-h-screen">
             {children}
+            <div className="fixed bottom-4 right-6 pointer-events-none z-50 opacity-15 font-serif text-slate-800 text-lg">
+              Lilac ✦
+            </div>
           </div>
         </Providers>
       </body>

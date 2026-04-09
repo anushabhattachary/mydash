@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { nextSunday, getDay, differenceInCalendarDays, startOfDay } from "date-fns";
+import { useUserProfile } from "@/lib/userProfile";
 
 // ─── Recurrence ────────────────────────────────────────────────
 export type RecurrencePreset =
@@ -206,15 +207,41 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoreState | null>(null);
 
+  const { profile, isLoaded } = useUserProfile();
+
   // Load from LocalStorage
   useEffect(() => {
-    const saved = localStorage.getItem("anusha-dashboard");
-    if (saved) {
+    if (!isLoaded) return;
+    if (!profile) {
+      // If no profile, we can load default state or clear it. 
+      // But typically OnboardingModal is covering the screen.
+      setState(defaultState);
+      return;
+    }
+
+    const { userId } = profile;
+    const settingsSaved = localStorage.getItem(`lilac_${userId}_settings`);
+    const habitsSaved = localStorage.getItem(`lilac_${userId}_habits`);
+    const goalsSaved = localStorage.getItem(`lilac_${userId}_goals`);
+    const todosSaved = localStorage.getItem(`lilac_${userId}_todos`);
+
+    let loadedSettings = defaultState.settings;
+    let loadedHabits = defaultState.habits;
+    let loadedGoals = defaultState.goals;
+    let loadedTodos = defaultState.todos;
+    let dataExisted = false;
+
+    // Check if we have the old "anusha-dashboard" data to migrate
+    const oldSaved = localStorage.getItem("anusha-dashboard");
+    if (oldSaved && !settingsSaved && !habitsSaved) {
+      // Migrate from old state to new
       try {
-        const parsed = JSON.parse(saved);
-        // Migrate old habits that lack new fields
+        const parsed = JSON.parse(oldSaved);
+        if (parsed.settings) loadedSettings = parsed.settings;
+        if (parsed.goals) loadedGoals = parsed.goals;
+        if (parsed.todos) loadedTodos = parsed.todos;
         if (parsed.habits) {
-          parsed.habits = parsed.habits.map((h: Habit & { type?: string }) => ({
+          loadedHabits = parsed.habits.map((h: Habit & { type?: string }) => ({
             ...h,
             duration: h.duration ?? 30,
             timeSlot: h.timeSlot ?? "09:00",
@@ -224,26 +251,47 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 ? { type: h.recurrence === "custom" ? "daily" : h.recurrence }
                 : h.recurrence ?? { type: "daily" },
           }));
-          // Remove deprecated "type" field from old habits
-          parsed.habits = parsed.habits.map(
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            ({ type, ...rest }: Habit & { type?: string }) => rest
-          );
+          loadedHabits = loadedHabits.map(({ type, ...rest }: any) => rest);
         }
-        setState(parsed);
-      } catch {
-        setState(defaultState);
+        localStorage.removeItem("anusha-dashboard");
+        dataExisted = true;
+      } catch (e) {
+        console.error("Failed to migrate data", e);
       }
     } else {
-      setState(defaultState);
+      if (settingsSaved) { loadedSettings = JSON.parse(settingsSaved); dataExisted = true; }
+      if (habitsSaved) {
+        const parsedHabits = JSON.parse(habitsSaved);
+        loadedHabits = parsedHabits.map((h: Habit & { type?: string }) => ({
+            ...h,
+            duration: h.duration ?? 30,
+            timeSlot: h.timeSlot ?? "09:00",
+            createdAt: h.createdAt ?? new Date().toISOString(),
+            recurrence:
+              typeof h.recurrence === "string"
+                ? { type: h.recurrence === "custom" ? "daily" : h.recurrence }
+                : h.recurrence ?? { type: "daily" },
+        }));
+      }
+      if (goalsSaved) { loadedGoals = JSON.parse(goalsSaved); dataExisted = true; }
+      if (todosSaved) { loadedTodos = JSON.parse(todosSaved); dataExisted = true; }
     }
-  }, []);
 
+    setState({
+      settings: loadedSettings,
+      habits: loadedHabits,
+      goals: loadedGoals,
+      todos: loadedTodos,
+    });
+  }, [profile?.userId, isLoaded]); // Re-load when userId changes
   useEffect(() => {
-    if (state) {
-      localStorage.setItem("anusha-dashboard", JSON.stringify(state));
+    if (state && profile?.userId) {
+      localStorage.setItem(`lilac_${profile.userId}_settings`, JSON.stringify(state.settings));
+      localStorage.setItem(`lilac_${profile.userId}_habits`, JSON.stringify(state.habits));
+      localStorage.setItem(`lilac_${profile.userId}_goals`, JSON.stringify(state.goals));
+      localStorage.setItem(`lilac_${profile.userId}_todos`, JSON.stringify(state.todos));
     }
-  }, [state]);
+  }, [state, profile?.userId]);
 
   if (!state) return null;
 

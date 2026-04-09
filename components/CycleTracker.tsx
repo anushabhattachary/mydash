@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { format, differenceInDays, startOfDay } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Leaf, Edit2, Plus, Droplet, Moon, Sun, Sparkles, X } from "lucide-react";
+import { useUserProfile } from "@/lib/userProfile";
 
 type PhaseName = "Menstrual" | "Follicular" | "Ovulation" | "Luteal";
 
@@ -32,6 +33,8 @@ export default function CycleTracker() {
   const [isClient, setIsClient] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
   const [data, setData] = useState<CycleData | null>(null);
+  
+  const { profile, isLoaded } = useUserProfile();
 
   // Setup Form State
   const [formDate, setFormDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -40,22 +43,33 @@ export default function CycleTracker() {
 
   useEffect(() => {
     setIsClient(true);
-    const stored = localStorage.getItem("cycleData");
+    if (!isLoaded || !profile) return;
+    
+    const stored = localStorage.getItem(`lilac_${profile.userId}_cycleData`);
     if (stored) {
       setData(JSON.parse(stored));
     } else {
-      setShowSetup(true);
+      // Check old key
+      const oldStored = localStorage.getItem("cycleData");
+      if (oldStored) {
+        setData(JSON.parse(oldStored));
+        localStorage.setItem(`lilac_${profile.userId}_cycleData`, oldStored);
+        localStorage.removeItem("cycleData");
+      } else {
+        setShowSetup(true);
+      }
     }
-  }, []);
+  }, [isLoaded, profile?.userId]);
 
   const saveSetup = () => {
+    if (!profile) return;
     const newData = {
       lastPeriodStart: new Date(formDate).toISOString(),
       cycleLength: formCycle,
       periodLength: formPeriod,
     };
     setData(newData);
-    localStorage.setItem("cycleData", JSON.stringify(newData));
+    localStorage.setItem(`lilac_${profile.userId}_cycleData`, JSON.stringify(newData));
     setShowSetup(false);
   };
 
@@ -140,19 +154,21 @@ export default function CycleTracker() {
   const currentPhase = getPhase(cycleDay);
 
   const resetCycle = () => {
-    if (!data) return;
+    if (!data || !profile) return;
     const newData = {
       ...data,
       lastPeriodStart: new Date().toISOString(),
     };
     setData(newData);
-    localStorage.setItem("cycleData", JSON.stringify(newData));
+    localStorage.setItem(`lilac_${profile.userId}_cycleData`, JSON.stringify(newData));
   };
 
   const addHabitToTasks = (habit: string, category: string, duration: string) => {
     try {
-      const storedTasksStr = localStorage.getItem("tasksForToday");
-      const storedCategoriesStr = localStorage.getItem("taskCategories");
+      if (!profile) return;
+      
+      const storedTasksStr = localStorage.getItem(`lilac_${profile.userId}_tasksForToday`);
+      const storedCategoriesStr = localStorage.getItem(`lilac_${profile.userId}_taskCategories`);
       
       const tasks = storedTasksStr ? JSON.parse(storedTasksStr) : [];
       const categories = storedCategoriesStr ? JSON.parse(storedCategoriesStr) : ["General", "Work", "Personal"];
@@ -170,8 +186,8 @@ export default function CycleTracker() {
         completed: false,
       };
 
-      localStorage.setItem("tasksForToday", JSON.stringify([...tasks, newTask]));
-      localStorage.setItem("taskCategories", JSON.stringify(categories));
+      localStorage.setItem(`lilac_${profile.userId}_tasksForToday`, JSON.stringify([...tasks, newTask]));
+      localStorage.setItem(`lilac_${profile.userId}_taskCategories`, JSON.stringify(categories));
       
       // Notify TasksForToday
       window.dispatchEvent(new Event("tasks-updated"));
