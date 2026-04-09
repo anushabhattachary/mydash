@@ -58,7 +58,7 @@ export default function TasksForToday() {
     } catch (e) {
       console.error("Failed to load tasks from local storage", e);
     }
-  }, [isLoaded, profile?.userId]);
+  }, [isLoaded, profile, profile?.userId]);
 
   // Listen for cross-component habit additions (e.g. from Cycle Tracker)
   useEffect(() => {
@@ -75,14 +75,14 @@ export default function TasksForToday() {
     };
     window.addEventListener("tasks-updated", handleTasksUpdated);
     return () => window.removeEventListener("tasks-updated", handleTasksUpdated);
-  }, [profile?.userId]);
+  }, [profile, profile?.userId]);
 
   useEffect(() => {
     if (isClient && profile?.userId) {
       localStorage.setItem(`lilac_${profile.userId}_tasksForToday`, JSON.stringify(tasks));
       localStorage.setItem(`lilac_${profile.userId}_taskCategories`, JSON.stringify(categories));
     }
-  }, [tasks, categories, isClient, profile?.userId]);
+  }, [tasks, categories, isClient, profile, profile?.userId]);
 
   const addTask = (e: React.FormEvent) => {
     e.preventDefault();

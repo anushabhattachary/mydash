@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Leaf } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useUserProfile } from "@/lib/userProfile";
 

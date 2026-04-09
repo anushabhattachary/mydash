@@ -229,7 +229,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     let loadedHabits = defaultState.habits;
     let loadedGoals = defaultState.goals;
     let loadedTodos = defaultState.todos;
-    let dataExisted = false;
 
     // Check if we have the old "anusha-dashboard" data to migrate
     const oldSaved = localStorage.getItem("anusha-dashboard");
@@ -251,15 +250,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 ? { type: h.recurrence === "custom" ? "daily" : h.recurrence }
                 : h.recurrence ?? { type: "daily" },
           }));
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
           loadedHabits = loadedHabits.map(({ type, ...rest }: any) => rest);
         }
         localStorage.removeItem("anusha-dashboard");
-        dataExisted = true;
       } catch (e) {
         console.error("Failed to migrate data", e);
       }
     } else {
-      if (settingsSaved) { loadedSettings = JSON.parse(settingsSaved); dataExisted = true; }
+      if (settingsSaved) { loadedSettings = JSON.parse(settingsSaved); }
       if (habitsSaved) {
         const parsedHabits = JSON.parse(habitsSaved);
         loadedHabits = parsedHabits.map((h: Habit & { type?: string }) => ({
@@ -273,8 +272,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 : h.recurrence ?? { type: "daily" },
         }));
       }
-      if (goalsSaved) { loadedGoals = JSON.parse(goalsSaved); dataExisted = true; }
-      if (todosSaved) { loadedTodos = JSON.parse(todosSaved); dataExisted = true; }
+      if (goalsSaved) { loadedGoals = JSON.parse(goalsSaved); }
+      if (todosSaved) { loadedTodos = JSON.parse(todosSaved); }
     }
 
     setState({
@@ -283,7 +282,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       goals: loadedGoals,
       todos: loadedTodos,
     });
-  }, [profile?.userId, isLoaded]); // Re-load when userId changes
+  }, [profile, profile?.userId, isLoaded]); // Re-load when userId changes
   useEffect(() => {
     if (state && profile?.userId) {
       localStorage.setItem(`lilac_${profile.userId}_settings`, JSON.stringify(state.settings));
@@ -291,7 +290,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(`lilac_${profile.userId}_goals`, JSON.stringify(state.goals));
       localStorage.setItem(`lilac_${profile.userId}_todos`, JSON.stringify(state.todos));
     }
-  }, [state, profile?.userId]);
+  }, [state, profile, profile?.userId]);
 
   if (!state) return null;
 
