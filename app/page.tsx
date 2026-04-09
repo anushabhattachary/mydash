@@ -4,6 +4,7 @@ import Timeline from "@/components/Timeline";
 import TasksForToday from "@/components/TasksForToday";
 import Goals from "@/components/Goals";
 import ToDo from "@/components/ToDo";
+import CycleTracker from "@/components/CycleTracker";
 import CalendarEvents from "@/components/CalendarEvents";
 
 export default function Home() {
@@ -14,6 +15,8 @@ export default function Home() {
         <LiveHeader />
         
         <div className="flex-1 overflow-y-auto px-4 md:px-12 pb-12 w-full custom-scrollbar">
+          <CycleTracker />
+          
           <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] xl:grid-cols-[1.2fr_1.5fr] gap-8 max-w-7xl mx-auto h-full items-start">
             
             {/* Left Column: Timeline and Tasks */}

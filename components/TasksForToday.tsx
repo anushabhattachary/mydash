@@ -40,6 +40,22 @@ export default function TasksForToday() {
     }
   }, []);
 
+  // Listen for cross-component habit additions (e.g. from Cycle Tracker)
+  useEffect(() => {
+    const handleTasksUpdated = () => {
+      try {
+        const savedTasks = localStorage.getItem("tasksForToday");
+        const savedCategories = localStorage.getItem("taskCategories");
+        if (savedTasks) setTasks(JSON.parse(savedTasks));
+        if (savedCategories) setCategories(JSON.parse(savedCategories));
+      } catch (e) {
+        console.error("Failed to reload tasks from local storage", e);
+      }
+    };
+    window.addEventListener("tasks-updated", handleTasksUpdated);
+    return () => window.removeEventListener("tasks-updated", handleTasksUpdated);
+  }, []);
+
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("tasksForToday", JSON.stringify(tasks));

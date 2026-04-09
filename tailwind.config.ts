@@ -17,6 +17,10 @@ const config: Config = {
         terra: "#D98064",
         clay: "#D4A373",
         linen: "#F7F5F0",
+        // Cycle Tracker phase colors
+        rose: "#E2C2C6",     // Menstrual
+        peach: "#F5DBCE",    // Follicular
+        lavender: "#C8B6CD", // Luteal
       },
       fontFamily: {
         serif: ["var(--font-cormorant)", "serif"],
