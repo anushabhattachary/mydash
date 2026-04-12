@@ -12,9 +12,101 @@
 body {
   color: var(--foreground);
   background: var(--background);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
+/* Safe area padding for notch/home indicator devices */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-all {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Timeline grid background */
 .timeline-bg {
   background-image: linear-gradient(to bottom, transparent 95%, rgba(0,0,0,0.05) 95%);
   background-size: 100% 64px;
+}
+
+/* Custom scrollbar — visible on desktop, hidden on mobile */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.1) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 100px;
+}
+
+/* Hide scrollbars on mobile */
+@media (max-width: 767px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .custom-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+}
+
+/* Snap scroll for cycle tracker horizontal scroll on mobile */
+.snap-scroll-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-scroll-x > * {
+  scroll-snap-align: start;
+}
+
+/* Touch target minimum size helper */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Momentum scrolling on all scrollable containers */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Standalone PWA: remove extra browser chrome space */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Disable text selection on interactive mobile elements */
+@media (max-width: 767px) {
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Bottom nav spacing — ensure content doesn't hide behind nav */
+.pb-mobile-nav {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }

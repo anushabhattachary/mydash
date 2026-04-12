@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
@@ -16,7 +16,25 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Lilac — Your Daily Sanctuary",
-  description: "A calm, beautiful daily life OS.",
+  description: "Track your days, honor your cycles, tend to your goals.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Lilac",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#C4A882",
 };
 
 export default function RootLayout({
@@ -26,6 +44,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#C4A882" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Lilac" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      </head>
       <body
         className={`${cormorant.variable} ${inter.variable} font-sans bg-linen text-slate-800 antialiased min-h-screen relative overflow-x-hidden`}
       >
@@ -69,9 +95,9 @@ export default function RootLayout({
           </svg>
         </div>
         <Providers>
-          <div className="relative z-10 flex flex-col md:flex-row min-h-screen">
+          <div className="relative z-10 flex flex-col md:flex-row min-h-screen safe-area-top">
             {children}
-            <div className="fixed bottom-4 right-6 pointer-events-none z-50 opacity-15 font-serif text-slate-800 text-lg">
+            <div className="fixed bottom-4 right-6 pointer-events-none z-50 opacity-15 font-serif text-slate-800 text-lg hidden md:block">
               Lilac ✦
             </div>
           </div>
