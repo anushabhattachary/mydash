@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { nextSunday, getDay, differenceInCalendarDays, startOfDay } from "date-fns";
+import { getDay, differenceInCalendarDays, startOfDay } from "date-fns";
 import { useUserProfile } from "@/lib/userProfile";
 
 // ─── Recurrence ────────────────────────────────────────────────
@@ -152,54 +152,10 @@ interface StoreContextType extends StoreState {
 }
 
 const defaultState: StoreState = {
-  settings: { name: "Anusha", recurByDefault: true },
-  habits: [
-    {
-      id: "h1",
-      title: "Morning Yoga",
-      timeSlot: "07:00",
-      duration: 30,
-      colorTag: "bg-sage",
-      recurrence: { type: "daily" },
-      completedDates: [],
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "h2",
-      title: "Evening Reading",
-      timeSlot: "20:00",
-      duration: 45,
-      colorTag: "bg-clay",
-      recurrence: { type: "daily" },
-      completedDates: [],
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  goals: [
-    {
-      id: "g1",
-      type: "short",
-      title: "Build a consistent morning routine",
-      progress: 40,
-      colorTag: "bg-sage",
-    },
-    {
-      id: "g2",
-      type: "long",
-      title: "Financial independence by 30",
-      progress: 15,
-      colorTag: "bg-terra",
-    },
-  ],
-  todos: [
-    {
-      id: "t1",
-      title: "Review weekly budget",
-      dueDate: nextSunday(new Date()).toISOString(),
-      priority: "medium",
-      completed: false,
-    },
-  ],
+  settings: { name: "", recurByDefault: true },
+  habits: [],
+  goals: [],
+  todos: [],
 };
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -230,34 +186,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     let loadedGoals = defaultState.goals;
     let loadedTodos = defaultState.todos;
 
-    // Check if we have the old "anusha-dashboard" data to migrate
-    const oldSaved = localStorage.getItem("anusha-dashboard");
-    if (oldSaved && !settingsSaved && !habitsSaved) {
-      // Migrate from old state to new
-      try {
-        const parsed = JSON.parse(oldSaved);
-        if (parsed.settings) loadedSettings = parsed.settings;
-        if (parsed.goals) loadedGoals = parsed.goals;
-        if (parsed.todos) loadedTodos = parsed.todos;
-        if (parsed.habits) {
-          loadedHabits = parsed.habits.map((h: Habit & { type?: string }) => ({
-            ...h,
-            duration: h.duration ?? 30,
-            timeSlot: h.timeSlot ?? "09:00",
-            createdAt: h.createdAt ?? new Date().toISOString(),
-            recurrence:
-              typeof h.recurrence === "string"
-                ? { type: h.recurrence === "custom" ? "daily" : h.recurrence }
-                : h.recurrence ?? { type: "daily" },
-          }));
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-          loadedHabits = loadedHabits.map(({ type, ...rest }: any) => rest);
-        }
-        localStorage.removeItem("anusha-dashboard");
-      } catch (e) {
-        console.error("Failed to migrate data", e);
-      }
-    } else {
       if (settingsSaved) { loadedSettings = JSON.parse(settingsSaved); }
       if (habitsSaved) {
         const parsedHabits = JSON.parse(habitsSaved);
@@ -274,6 +202,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
       if (goalsSaved) { loadedGoals = JSON.parse(goalsSaved); }
       if (todosSaved) { loadedTodos = JSON.parse(todosSaved); }
+
+    // Sync settings name from user profile if it's empty
+    if (!loadedSettings.name && profile?.name) {
+      loadedSettings = { ...loadedSettings, name: profile.name };
     }
 
     setState({
@@ -340,7 +272,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     deleteTodo: (id) =>
       setState({ ...state, todos: state.todos.filter((i) => i.id !== id) }),
 
-    clearAllData: () => setState(defaultState),
+    clearAllData: () => {
+      // Wipe all lilac_* keys from localStorage
+      if (profile?.userId) {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith(`lilac_${profile.userId}_`) || key.startsWith('lilac_'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+      }
+      // Also remove any legacy keys
+      localStorage.removeItem('anusha-dashboard');
+      // Reset in-memory store to clean state
+      setState(defaultState);
+    },
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
