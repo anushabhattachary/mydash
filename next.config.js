@@ -23,7 +23,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
       },
     },
     {
-      urlPattern: /\/api\/.*/,
+      urlPattern: /\/api\/(?!auth).*/,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'api-cache',
