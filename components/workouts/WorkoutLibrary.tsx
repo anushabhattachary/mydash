@@ -56,7 +56,7 @@ export default function WorkoutLibrary({ onNavigate }: { onNavigate: (view: Work
       </div>
       <p className="text-sm text-slate-500 font-medium -mt-4 mb-4">Tap to start · Hold to edit</p>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 pb-32">
         <AnimatePresence>
           {workouts.length === 0 ? (
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-slate-400 text-center py-8 italic font-serif">
@@ -134,14 +134,14 @@ export default function WorkoutLibrary({ onNavigate }: { onNavigate: (view: Work
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-0"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
           >
             <motion.div
               initial={{ y: "100%", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-linen w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-xl relative"
+              className="bg-linen w-full max-w-md rounded-3xl p-6 shadow-xl relative"
             >
               <button
                 onClick={() => setIsModalOpen(false)}

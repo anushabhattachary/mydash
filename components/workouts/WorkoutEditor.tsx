@@ -104,7 +104,7 @@ function SortableExerciseItem({
                    className="font-serif text-lg text-slate-800 bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-sage/50 rounded w-full p-0 py-0.5"
                    placeholder="Exercise Name"
                  />
-                 <div className="flex items-center gap-3 text-xs">
+                 <div className="flex flex-wrap items-center gap-2 text-xs mt-1">
                     <div className="flex items-center gap-1.5 bg-white rounded-md px-2 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.05)] text-slate-600 font-medium">
                       <span>Reps</span>
                       <button onClick={() => updateExercise(exercise.id, { reps: Math.max(1, exercise.reps - 1) })} className="px-1 hover:text-terra">−</button>
@@ -297,7 +297,7 @@ export default function WorkoutEditor({ workoutId, onNavigate }: { workoutId: st
         </DndContext>
 
         {/* Add Buttons */}
-        <div className="pl-16 pt-2 pb-24 flex flex-col gap-3 relative z-10">
+        <div className="pl-16 pt-2 pb-40 flex flex-col gap-3 relative z-10">
           <button 
              onClick={addExercise}
              className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-terra transition-colors self-start bg-white/50 px-4 py-2 rounded-xl shadow-sm border border-transparent hover:border-sand"
