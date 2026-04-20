@@ -204,7 +204,7 @@ export default function WorkoutPlayer({ workoutId, onNavigate }: { workoutId: st
       {/* Main Timeline Scroller */}
       <div className="flex-1 overflow-hidden relative z-10 flex flex-col items-center justify-center pb-24">
         
-       <div className="w-full max-w-md px-6 relative flex flex-col items-center h-[120vh]">
+       <div className="w-full max-w-md px-6 relative flex flex-col items-center h-full">
          {/* We absolutely position the items centered around the middle of this tall container based on index difference */}
          
          <AnimatePresence>

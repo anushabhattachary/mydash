@@ -22,6 +22,16 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+const formatTime = (secs: number | null) => {
+  if (!secs) return '0s';
+  if (secs >= 60) {
+    const m = Math.floor(secs/60);
+    const s = secs % 60;
+    return s > 0 ? `${m}m ${s}s` : `${m}m`;
+  }
+  return `${secs}s`;
+};
+
 // Helper component for Sortable Item rendering
 function SortableExerciseItem({ 
   exercise, 
@@ -117,11 +127,11 @@ function SortableExerciseItem({
                       {exercise.secondsPerRep !== null ? (
                         <>
                           <button onClick={() => {
-                            const val = (exercise.secondsPerRep || 0) - 1;
+                            const val = (exercise.secondsPerRep || 0) - 15;
                             updateExercise(exercise.id, { secondsPerRep: val <= 0 ? null : val });
                           }} className="px-1 hover:text-terra">−</button>
-                          <span className="w-6 text-center">{exercise.secondsPerRep}s</span>
-                          <button onClick={() => updateExercise(exercise.id, { secondsPerRep: (exercise.secondsPerRep || 0) + 1 })} className="px-1 hover:text-terra">+</button>
+                          <span className="w-10 text-center text-[11px] min-w-[2.5rem]">{formatTime(exercise.secondsPerRep)}</span>
+                          <button onClick={() => updateExercise(exercise.id, { secondsPerRep: (exercise.secondsPerRep || 0) + 15 })} className="px-1 hover:text-terra">+</button>
                         </>
                       ) : (
                         <button onClick={() => updateExercise(exercise.id, { secondsPerRep: 5 })} className="text-sage px-1 hover:text-sage/80"><Plus className="w-3 h-3"/></button>
@@ -136,8 +146,8 @@ function SortableExerciseItem({
                <div className="flex items-center gap-1.5 self-start bg-white/60 rounded-md px-2 py-1 text-slate-600 font-medium text-xs">
                   <span>Duration</span>
                   <button onClick={() => updateExercise(exercise.id, { secondsPerRep: Math.max(15, (exercise.secondsPerRep || 30) - 15) })} className="px-1 hover:text-[#7c6a96]">−</button>
-                  <span className="w-8 text-center">{exercise.secondsPerRep}s</span>
-                  <button onClick={() => updateExercise(exercise.id, { secondsPerRep: Math.min(300, (exercise.secondsPerRep || 30) + 15) })} className="px-1 hover:text-[#7c6a96]">+</button>
+                  <span className="w-10 text-center text-[11px] min-w-[2.5rem]">{formatTime(exercise.secondsPerRep)}</span>
+                  <button onClick={() => updateExercise(exercise.id, { secondsPerRep: Math.min(600, (exercise.secondsPerRep || 30) + 15) })} className="px-1 hover:text-[#7c6a96]">+</button>
                </div>
              </div>
           )}
