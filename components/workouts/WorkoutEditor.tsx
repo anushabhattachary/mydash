@@ -1,9 +1,8 @@
 "use client";
 
-import { useStore, Workout, WorkoutExercise } from "@/lib/store";
+import { useStore, WorkoutExercise } from "@/lib/store";
 import { ArrowLeft, Play, Plus, Trash2, GripVertical, Image as ImageIcon } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useEffect } from "react";
 import { WorkoutViewState } from "./WorkoutManager";
 import { 
   DndContext, 

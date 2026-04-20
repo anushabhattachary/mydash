@@ -1,9 +1,9 @@
 "use client";
 
 import { useStore } from "@/lib/store";
-import { ArrowLeft, Pause, Play, SkipForward, X, RefreshCcw } from "lucide-react";
+import { Pause, Play, SkipForward, X, RefreshCcw } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
-import { motion, AnimatePresence, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { WorkoutViewState } from "./WorkoutManager";
 
 type PlayerState = "IDLE" | "ACTIVE" | "PAUSED" | "DONE";
@@ -15,7 +15,7 @@ export default function WorkoutPlayer({ workoutId, onNavigate }: { workoutId: st
   // Unroll the workout into a flat sequence for the timeline based on setRepeats
   const sequence = useMemo(() => {
     if (!workout) return [];
-    let seq: { seqId: string, exercise: typeof workout.exercises[0], setIndex: number, globalIndex: number }[] = [];
+    const seq: { seqId: string, exercise: typeof workout.exercises[0], setIndex: number, globalIndex: number }[] = [];
     let globalIndex = 0;
     for (let s = 1; s <= workout.setRepeats; s++) {
       workout.exercises.forEach((ex) => {
@@ -75,7 +75,8 @@ export default function WorkoutPlayer({ workoutId, onNavigate }: { workoutId: st
     }
     return () => {
       if (repTimerRef.current) clearTimeout(repTimerRef.current);
-    };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerState, timeLeft]);
 
   // Progress circular bar calculation
@@ -214,7 +215,7 @@ export default function WorkoutPlayer({ workoutId, onNavigate }: { workoutId: st
            const isActive = offset === 0;
            const isPast = offset < 0;
 
-           let yPos = offset * 260; // Base spacing
+           const yPos = offset * 260; // Base spacing
 
            return (
              <motion.div
