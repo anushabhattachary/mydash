@@ -113,11 +113,14 @@ function SortableExerciseItem({
                     </div>
 
                     <div className="flex items-center gap-1.5 bg-white rounded-md px-2 py-1 shadow-[0_1px_2px_rgba(0,0,0,0.05)] text-slate-600 font-medium whitespace-nowrap overflow-hidden">
-                      <span>{exercise.secondsPerRep ? 'Sec/Rep' : 'Add Timer'}</span>
+                      <span>{exercise.secondsPerRep !== null ? 'Timer' : 'Add Timer'}</span>
                       {exercise.secondsPerRep !== null ? (
                         <>
-                          <button onClick={() => updateExercise(exercise.id, { secondsPerRep: Math.max(0, (exercise.secondsPerRep || 0) - 1) })} className="px-1 hover:text-terra">−</button>
-                          <span className="w-4 text-center">{exercise.secondsPerRep}</span>
+                          <button onClick={() => {
+                            const val = (exercise.secondsPerRep || 0) - 1;
+                            updateExercise(exercise.id, { secondsPerRep: val <= 0 ? null : val });
+                          }} className="px-1 hover:text-terra">−</button>
+                          <span className="w-6 text-center">{exercise.secondsPerRep}s</span>
                           <button onClick={() => updateExercise(exercise.id, { secondsPerRep: (exercise.secondsPerRep || 0) + 1 })} className="px-1 hover:text-terra">+</button>
                         </>
                       ) : (
