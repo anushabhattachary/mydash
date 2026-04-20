@@ -129,12 +129,34 @@ export interface UserSettings {
   recurByDefault: boolean;
 }
 
+// ─── Workout ───────────────────────────────────────────────────
+export interface WorkoutExercise {
+  id: string;
+  type: "exercise" | "break";
+  name: string;
+  imageUrl: string | null;
+  reps: number;
+  secondsPerRep: number | null;
+}
+
+export interface Workout {
+  id: string;
+  name: string;
+  colorTag: string;
+  setRepeats: number;
+  globalReps: number;
+  exercises: WorkoutExercise[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Store ─────────────────────────────────────────────────────
 interface StoreState {
   settings: UserSettings;
   habits: Habit[];
   goals: Goal[];
   todos: Todo[];
+  workouts: Workout[];
 }
 
 interface StoreContextType extends StoreState {
@@ -148,6 +170,9 @@ interface StoreContextType extends StoreState {
   addTodo: (todo: Omit<Todo, "id" | "completed">) => void;
   updateTodo: (id: string, todo: Partial<Todo>) => void;
   deleteTodo: (id: string) => void;
+  addWorkout: (workout: Omit<Workout, "id" | "createdAt" | "updatedAt">) => Workout;
+  updateWorkout: (id: string, workout: Partial<Workout>) => void;
+  deleteWorkout: (id: string) => void;
   clearAllData: () => void;
 }
 
@@ -156,6 +181,7 @@ const defaultState: StoreState = {
   habits: [],
   goals: [],
   todos: [],
+  workouts: [],
 };
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -180,11 +206,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const habitsSaved = localStorage.getItem(`lilac_${userId}_habits`);
     const goalsSaved = localStorage.getItem(`lilac_${userId}_goals`);
     const todosSaved = localStorage.getItem(`lilac_${userId}_todos`);
+    const workoutsSaved = localStorage.getItem(`lilac_${userId}_workouts`);
 
     let loadedSettings = defaultState.settings;
     let loadedHabits = defaultState.habits;
     let loadedGoals = defaultState.goals;
     let loadedTodos = defaultState.todos;
+    let loadedWorkouts = defaultState.workouts;
 
       if (settingsSaved) { loadedSettings = JSON.parse(settingsSaved); }
       if (habitsSaved) {
@@ -202,6 +230,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
       if (goalsSaved) { loadedGoals = JSON.parse(goalsSaved); }
       if (todosSaved) { loadedTodos = JSON.parse(todosSaved); }
+      if (workoutsSaved) { loadedWorkouts = JSON.parse(workoutsSaved); }
 
     // Sync settings name from user profile if it's empty
     if (!loadedSettings.name && profile?.name) {
@@ -213,6 +242,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       habits: loadedHabits,
       goals: loadedGoals,
       todos: loadedTodos,
+      workouts: loadedWorkouts,
     });
   }, [profile, profile?.userId, isLoaded]); // Re-load when userId changes
   useEffect(() => {
@@ -221,6 +251,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(`lilac_${profile.userId}_habits`, JSON.stringify(state.habits));
       localStorage.setItem(`lilac_${profile.userId}_goals`, JSON.stringify(state.goals));
       localStorage.setItem(`lilac_${profile.userId}_todos`, JSON.stringify(state.todos));
+      localStorage.setItem(`lilac_${profile.userId}_workouts`, JSON.stringify(state.workouts));
     }
   }, [state, profile, profile?.userId]);
 
@@ -271,6 +302,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }),
     deleteTodo: (id) =>
       setState({ ...state, todos: state.todos.filter((i) => i.id !== id) }),
+
+    addWorkout: (w) => {
+      const newWorkout = {
+        ...w,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setState({ ...state, workouts: [...state.workouts, newWorkout] });
+      return newWorkout;
+    },
+    updateWorkout: (id, w) =>
+      setState({
+        ...state,
+        workouts: state.workouts.map((i) =>
+          i.id === id ? { ...i, ...w, updatedAt: new Date().toISOString() } : i
+        ),
+      }),
+    deleteWorkout: (id) =>
+      setState({ ...state, workouts: state.workouts.filter((i) => i.id !== id) }),
 
     clearAllData: () => {
       // Wipe all lilac_* keys from localStorage

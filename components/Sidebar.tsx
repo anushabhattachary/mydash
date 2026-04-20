@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Settings, Flower2, CheckSquare, Target } from "lucide-react";
+import { Clock, Settings, Flower2, CheckSquare, Target, Dumbbell } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -9,6 +9,7 @@ const navItems = [
   { label: "Today", icon: Clock, href: "/", tab: "today", emoji: "🏠" },
   { label: "Cycle", icon: Flower2, href: "/?tab=cycle", tab: "cycle", emoji: "🌸" },
   { label: "To-Do", icon: CheckSquare, href: "/?tab=todo", tab: "todo", emoji: "✓" },
+  { label: "Workout", icon: Dumbbell, href: "/?tab=workout", tab: "workout", emoji: "💪" },
   { label: "Goals", icon: Target, href: "/?tab=goals", tab: "goals", emoji: "🎯" },
   { label: "Settings", icon: Settings, href: "/settings", tab: "settings", emoji: "⚙️" },
 ];

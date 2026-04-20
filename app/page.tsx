@@ -11,6 +11,7 @@ import ToDo from "@/components/ToDo";
 import CycleTracker from "@/components/CycleTracker";
 import CalendarEvents from "@/components/CalendarEvents";
 import PullToRefresh from "@/components/PullToRefresh";
+import WorkoutManager from "@/components/workouts/WorkoutManager";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -52,6 +53,9 @@ function HomeContent() {
                     <Goals />
                   </div>
                   <div className="border-t border-sand/50 pt-12">
+                    <WorkoutManager />
+                  </div>
+                  <div className="border-t border-sand/50 pt-12">
                     <ToDo />
                   </div>
                 </div>
@@ -90,6 +94,10 @@ function HomeContent() {
 
               {mobileTab === "goals" && (
                 <Goals />
+              )}
+              
+              {mobileTab === "workout" && (
+                <WorkoutManager />
               )}
             </div>
 
